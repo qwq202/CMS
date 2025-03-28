@@ -1,0 +1,59 @@
+# 云智汇CMS Docker忽略文件配置
+
+# 开发环境文件
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.npm
+.yarn
+.pnp
+.pnp.js
+
+# 环境变量文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 编辑器配置
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# 源码控制
+.git
+.gitignore
+.github
+
+# 构建产物和临时文件
+dist
+build
+coverage
+.nyc_output
+*.log
+
+# 文档
+README.md
+CHANGELOG.md
+docs/
+*.md
+
+# Docker相关文件(不需要递归复制)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# 日志和上传目录（将由容器挂载）
+logs/
+uploads/
+
+# 测试文件
+__tests__
+test
+tests
+*.test.js
+*.spec.js
