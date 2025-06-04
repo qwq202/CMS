@@ -5,14 +5,21 @@ const { Solution } = require('../models');
 // @access  公开
 exports.getSolutions = async (req, res) => {
   try {
-    const solutions = await Solution.findAll({
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: solutions } = await Solution.findAndCountAll({
       where: { isActive: true },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
     });
 
     res.json({
       success: true,
-      count: solutions.length,
+      count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
       data: solutions
     });
   } catch (error) {
@@ -64,17 +71,24 @@ exports.getSolutionBySlug = async (req, res) => {
 // @access  公开
 exports.getSolutionsByIndustry = async (req, res) => {
   try {
-    const solutions = await Solution.findAll({
-      where: { 
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: solutions } = await Solution.findAndCountAll({
+      where: {
         industry: req.params.industry,
         isActive: true
       },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
     });
 
     res.json({
       success: true,
-      count: solutions.length,
+      count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
       data: solutions
     });
   } catch (error) {
