@@ -51,10 +51,10 @@ app.get('*', (req, res) => {
 // 错误处理中间件
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
     success: false,
-    error: '服务器内部错误',
-    message: process.env.NODE_ENV === 'development' ? err.message : '请联系管理员'
+    error: err.message || '服务器内部错误'
   });
 });
 
