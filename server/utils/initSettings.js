@@ -179,7 +179,22 @@ const defaultSettings = [
     label: '统计代码',
     description: '网站统计代码，如百度统计、CNZZ等',
     isPublic: false
-  }
+  },
+  {
+    key: 'storage_type',
+    value: 'local',
+    type: 'text',
+    group: 'system',
+    label: '存储类型',
+    description: '文件存储方式，local 或 s3',
+    isPublic: false
+  },
+  { key: 's3_endpoint', value: '', type: 'text', group: 'system', label: 'S3 Endpoint', description: 'S3 服务地址', isPublic: false },
+  { key: 's3_region', value: '', type: 'text', group: 'system', label: 'S3 Region', description: 'S3 区域', isPublic: false },
+  { key: 's3_bucket', value: '', type: 'text', group: 'system', label: 'S3 Bucket', description: 'S3 桶名称', isPublic: false },
+  { key: 's3_access_key', value: '', type: 'text', group: 'system', label: 'S3 Access Key', description: '访问密钥', isPublic: false },
+  { key: 's3_secret_key', value: '', type: 'text', group: 'system', label: 'S3 Secret Key', description: '访问密钥Secret', isPublic: false },
+  { key: 's3_base_url', value: '', type: 'text', group: 'system', label: 'S3 Base URL', description: '文件访问基础地址', isPublic: false }
 ];
 
 /**
