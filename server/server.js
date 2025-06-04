@@ -106,10 +106,14 @@ const startServer = async () => {
     await initSettings();
     await initDefaultSettings();
 
-    // 确保上传目录存在
-    const uploadDir = process.env.UPLOAD_PATH || path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // 根据存储类型创建上传目录（仅在本地存储时）
+    const storageTypeSetting = await Setting.findByPk('storage_type');
+    const storageType = storageTypeSetting ? storageTypeSetting.value : process.env.STORAGE_TYPE || 'local';
+    if (storageType === 'local') {
+      const uploadDir = process.env.UPLOAD_PATH || path.join(__dirname, 'uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
     }
 
     app.listen(PORT, () => {
