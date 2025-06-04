@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 const { sequelize } = require('./config/db');
 const { User, Product, Solution, Contact, Setting } = require('./models'); // 显式导入所有模型
@@ -9,6 +10,7 @@ const initAdminAccount = require('./utils/initAdmin'); // 引入管理员初始�
 const initSettings = require('./utils/initSettings'); // 引入基本设置初始化脚本
 const initDefaultSettings = require('./utils/initDefaultSettings'); // 引入动态内容默认设置脚本
 const createSettingsTable = require('./utils/createSettingsTable'); // 引入创建设置表脚本
+const eventBus = require('./utils/eventBus');
 
 // 加载环境变量
 dotenv.config();
@@ -32,6 +34,31 @@ app.use('/api/contacts', require('./routes/contactRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/settings', require('./routes/settingRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
+// SSE事件流
+const sseClients = [];
+app.get('/api/events', (req, res) => {
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive'
+  });
+  res.flushHeaders();
+
+  sseClients.push(res);
+
+  req.on('close', () => {
+    const index = sseClients.indexOf(res);
+    if (index !== -1) sseClients.splice(index, 1);
+  });
+});
+
+eventBus.on('settingsUpdated', () => {
+  sseClients.forEach((client) => {
+    client.write(`event: settingsUpdated\ndata: "updated"\n\n`);
+  });
+});
 
 // 健康检查端点 - 用于Docker容器健康检查
 app.get('/api/health', (req, res) => {
@@ -78,6 +105,12 @@ const startServer = async () => {
     await initAdminAccount();
     await initSettings();
     await initDefaultSettings();
+
+    // 确保上传目录存在
+    const uploadDir = process.env.UPLOAD_PATH || path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
 
     app.listen(PORT, () => {
       console.log(`服务器运行在端口 ${PORT}`);

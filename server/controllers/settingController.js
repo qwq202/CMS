@@ -1,4 +1,5 @@
 const { Setting } = require('../models');
+const eventBus = require('../utils/eventBus');
 
 // 获取所有设置
 exports.getAllSettings = async (req, res) => {
@@ -157,6 +158,7 @@ exports.updateSetting = async (req, res) => {
       data: setting,
       message: '设置已保存'
     });
+    eventBus.emit('settingsUpdated');
   } catch (error) {
     console.error('保存设置失败:', error);
     res.status(500).json({
@@ -253,6 +255,7 @@ exports.bulkUpdateSettings = async (req, res) => {
       success: true,
       message: '所有设置已保存'
     });
+    eventBus.emit('settingsUpdated');
   } catch (error) {
     console.error('批量保存设置失败:', error);
     res.status(500).json({

@@ -5,14 +5,21 @@ const { Product } = require('../models');
 // @access  公开
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.findAll({
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: products } = await Product.findAndCountAll({
       where: { isActive: true },
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
     });
 
     res.json({
       success: true,
-      count: products.length,
+      count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
       data: products
     });
   } catch (error) {

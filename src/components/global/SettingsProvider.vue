@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { computed, onMounted, ref, provide } from 'vue';
+import { onMounted, ref, provide } from 'vue';
 import settingService from '../../services/settingService';
 
 export default {
@@ -53,9 +53,13 @@ export default {
       }
     };
     
-    // 页面加载时加载设置
+    // 页面加载时加载设置并订阅更新事件
     onMounted(() => {
       loadSettings();
+      const evtSource = new EventSource('/api/events');
+      evtSource.addEventListener('settingsUpdated', () => {
+        loadSettings();
+      });
     });
     
     // 向下级组件提供设置数据
